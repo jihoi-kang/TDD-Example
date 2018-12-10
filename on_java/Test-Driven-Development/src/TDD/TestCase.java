@@ -1,16 +1,15 @@
 package TDD;
 
 import static org.junit.Assert.*;
-
 import java.util.Hashtable;
-
 import org.junit.Test;
 
 /**
- * Money Test
+ * 화폐 단위 통일 및 합산 테스트
  * @author jihoi
+ * @source 'Test-Driven-Development:By Example' - 'Kent Beck'
  */
-public class TDD1 {
+public class TestCase {
 	@Test
 	public void testMultiplication(){
 		Money five=Money.dollar(5);
@@ -105,114 +104,3 @@ public class TDD1 {
 	}
 }
 
-class Pair{
-	private String from;
-	private String to;
-	Pair(String from,String to) {
-		this.from=from;
-		this.to=to;
-	}
-	public boolean equals(Object object) {
-		Pair pair=(Pair)object;
-		return from.equals(pair.from)&&to.equals(pair.to);
-	}
-	public int hashCode() {
-		return 0;
-	}
-}
-
-class Sum implements Expression{
-	Expression augend;
-	Expression addend;
-	
-	Sum(Expression augend,Expression addend){
-		this.augend=augend;
-		this.addend=addend;
-	}
-	
-	public Money reduce(Bank bank,String to) {
-		int amount=augend.reduce(bank,to).amount
-				+addend.reduce(bank,to).amount;
-		return new Money(amount,to);
-	}
-	
-	public Expression plus(Expression addend) {
-		return new Sum(this,addend);
-	}
-	
-	public Expression times(int multiplier) {
-		return new Sum(augend.times(multiplier)
-				,addend.times(multiplier));
-	}
-}
-
-class Bank{
-	Bank(){}
-	private Hashtable rates=new Hashtable();
-	
-	int rate(String from,String to) {
-		if(from.equals(to)) return 1;
-		Integer rate=(Integer)rates.get(new Pair(from,to));
-		return rate;
-	}
-	
-	Money reduce(Expression source,String to) {
-		return source.reduce(this,to);
-	}
-	
-	void addRate(String from,String to,int rate) {
-		rates.put(new Pair(from,to), new Integer(rate));
-	}
-	
-}
-
-interface Expression{
-	Money reduce(Bank bank,String to);
-	Expression plus(Expression addend);
-	Expression times(int multiplier);
-}
-
-class Money implements Expression {
-	protected int amount;
-	protected String currency;
-	
-	Money(int amount,String currency){
-		this.amount=amount;
-		this.currency=currency;
-	}
-	
-	public Money reduce(Bank bank,String to) {
-		int rate=bank.rate(currency, to);
-		return new Money(amount/rate,to);
-	}
-	
-	public Expression times(int multiplier){
-		return new Money(amount*multiplier,currency);
-	}
-	
-	public Expression plus(Expression addend) {
-		return new Sum(this,addend);
-	}
-	
-	public boolean equals(Object object) {
-		Money money=(Money)object;
-		return amount==money.amount
-			&& currency().equals(money.currency());
-	}
-	
-	static Money dollar(int amount) {
-		return new Money(amount,"USD");
-	}
-	
-	static Money franc(int amount) {
-		return new Money(amount,"CHF");
-	}
-	
-	String currency() {
-		return currency;
-	}
-	
-	public String toString() {
-		return amount+" "+currency;
-	}
-}
